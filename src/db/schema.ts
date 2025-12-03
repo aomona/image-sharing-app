@@ -12,11 +12,11 @@ export * from "@/db/auth-scheme";
 export const post = pgTable(
   "post",
   {
-    id: uuid().primaryKey().defaultRandom(),
+    id: uuid("id").primaryKey().defaultRandom(),
     title: text("title").notNull(),
     imageUrl: text("image_url").notNull(),
     description: text("description"),
-    ccLisence: text("cc_license").notNull(),
+    ccLicense: text("cc_license").notNull(),
     downloadable: boolean("downloadable"),
     userId: text("user_id")
       .notNull()
