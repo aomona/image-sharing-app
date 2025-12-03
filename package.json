@@ -17,6 +17,8 @@
     ]
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
+    "drizzle-orm": "^0.44.7",
     "next": "16.0.7",
     "react": "19.2.0",
     "react-dom": "19.2.0"
@@ -27,6 +29,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
+    "drizzle-kit": "^0.31.7",
     "eslint": "^9",
     "eslint-config-next": "16.0.7",
     "eslint-config-prettier": "^10.1.8",
