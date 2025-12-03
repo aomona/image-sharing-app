@@ -15,6 +15,13 @@
       "when": 1764798464623,
       "tag": "0001_glossy_darwin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1764801676224,
+      "tag": "0002_brave_rachel_grey",
+      "breakpoints": true
     }
   ]
 }
