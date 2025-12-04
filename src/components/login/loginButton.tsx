@@ -1,3 +1,6 @@
+"use client";
+
+import { signIn } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import {
@@ -24,7 +27,17 @@ export function LoginButton() {
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="sm:justify-start">
-          <Button className="w-full" variant="outline">
+          <Button
+            onClick={async () => {
+              await signIn.social({
+                provider: "google",
+                callbackURL: "/",
+                newUserCallbackURL: "/welcome",
+              });
+            }}
+            className="w-full"
+            variant="outline"
+          >
             <Image width={16} height={16} src="/google.svg" alt="googlelogo" />
             Googleでログイン
           </Button>
