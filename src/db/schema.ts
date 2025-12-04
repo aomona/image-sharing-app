@@ -19,6 +19,7 @@ export const post = pgTable(
     imageUrl: text("image_url").notNull(),
     filter: json("filter"),
     description: text("description"),
+    tags: text("tags").array(),
     ccLicense: text("cc_license").notNull(),
     downloadable: boolean("downloadable"),
     userId: text("user_id")
