@@ -5,6 +5,7 @@ import {
   text,
   index,
   timestamp,
+  json,
 } from "drizzle-orm/pg-core";
 import { user } from "@/db/auth-scheme";
 export * from "@/db/auth-scheme";
@@ -14,7 +15,9 @@ export const post = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     title: text("title").notNull(),
+    originalImageUrl: text("original_image_url").notNull(),
     imageUrl: text("image_url").notNull(),
+    filter: json("filter"),
     description: text("description"),
     ccLicense: text("cc_license").notNull(),
     downloadable: boolean("downloadable"),
