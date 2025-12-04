@@ -32,7 +32,6 @@ export function LoginButton() {
               await signIn.social({
                 provider: "google",
                 callbackURL: "/",
-                newUserCallbackURL: "/welcome",
               });
             }}
             className="w-full"
