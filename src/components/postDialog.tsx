@@ -123,9 +123,7 @@ export function PostDialog() {
                       onBlur={field.handleBlur}
                       onChange={(e) => {
                         const file = e.target.files?.[0];
-                        if (file) {
-                          field.handleChange(file);
-                        }
+                        field.handleChange(file ?? undefined);
                       }}
                       aria-invalid={isInvalid}
                     />
