@@ -31,25 +31,28 @@ export async function postAction(data: FormData) {
     downloadable: downloadable,
     tags: tags,
   });
-
+  const safeName = parsedData.image.name.replace(/[^a-zA-Z0-9._-]/g, "_");
   const params = {
     Bucket: process.env.R2_BUCKET_NAME,
-    Key: `images/${crypto.randomUUID()}-${parsedData.image.name}`,
+    Key: `images/${crypto.randomUUID()}-${safeName}`,
     Body: Buffer.from(await parsedData.image.arrayBuffer()),
     ContentType: parsedData.image.type,
   };
-
-  await r2.send(new PutObjectCommand(params));
-  const imageUrl = `${process.env.R2_CUSTOM_DOMAIN_URL}/${params.Key}`;
-  await db.insert(post).values({
-    title: parsedData.title,
-    originalImageUrl: imageUrl,
-    imageUrl: imageUrl,
-    description: parsedData.description,
-    ccLicense: parsedData.license,
-    filter: {},
-    downloadable: parsedData.downloadable,
-    userId: session.user.id,
-    tags: parsedData.tags,
-  });
+  try {
+    await r2.send(new PutObjectCommand(params));
+    const imageUrl = `${process.env.R2_CUSTOM_DOMAIN_URL}/${params.Key}`;
+    await db.insert(post).values({
+      title: parsedData.title,
+      originalImageUrl: imageUrl,
+      imageUrl: imageUrl,
+      description: parsedData.description,
+      ccLicense: parsedData.license,
+      filter: {},
+      downloadable: parsedData.downloadable,
+      userId: session.user.id,
+      tags: parsedData.tags,
+    });
+  } catch {
+    throw new Error("画像のアップロードに失敗しました。");
+  }
 }
