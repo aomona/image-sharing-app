@@ -74,11 +74,10 @@ export function PostDialog() {
               ? `画像の投稿に失敗しました。 ${err.message}`
               : "画像の投稿に失敗しました。",
         });
+        setOpen(false);
+        form.reset();
+        setTagsInput("");
       } catch {}
-
-      setOpen(false);
-      form.reset();
-      setTagsInput("");
     },
   });
 
@@ -383,7 +382,11 @@ export function PostDialog() {
         </form>
 
         <DialogFooter>
-          <Button type="submit" form="post-form">
+          <Button
+            type="submit"
+            form="post-form"
+            disabled={form.state.isSubmitting}
+          >
             投稿
           </Button>
         </DialogFooter>
