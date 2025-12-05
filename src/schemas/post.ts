@@ -25,23 +25,16 @@ export type License = (typeof licenseValues)[number];
 
 export const postSchema = z.object({
   image: z
-    .custom<File>()
-    .refine((file) => file instanceof File, {
-      message: "画像ファイルを選択してください。",
-    })
-    .refine((file) => file.size <= 50 * 1024 * 1024, {
-      message: "画像サイズは50MB以下にしてください。",
-    })
-    .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), {
-      message: "サポートされていない形式です。",
-    }),
+    .file({ error: "画像ファイルを選択してください。" })
+    .mime(ACCEPTED_IMAGE_TYPES, { error: "サポートされていない形式です。" })
+    .max(50 * 1024 * 1024, { error: "画像サイズは50MB以下にしてください。" }),
   title: z
     .string()
-    .min(1, { message: "タイトルは必須です。" })
-    .max(20, { message: "タイトルは20文字以下にしてください。" }),
+    .min(1, { error: "タイトルは必須です。" })
+    .max(20, { error: "タイトルは20文字以下にしてください。" }),
   description: z
     .string()
-    .max(200, { message: "説明は200文字以下にしてください。" }),
+    .max(200, { error: "説明は200文字以下にしてください。" }),
   license: z.enum(licenseValues),
 });
 
