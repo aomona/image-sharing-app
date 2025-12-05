@@ -39,6 +39,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 export function PostDialog() {
   const [open, setOpen] = useState(false);
+  const [tagsInput, setTagsInput] = useState("");
 
   const form = useForm({
     defaultValues: {
@@ -47,9 +48,11 @@ export function PostDialog() {
       description: "",
       license: "none",
       downloadable: false,
+      tags: [],
     } as PostFormInput,
     validators: {
       onSubmit: postSchema,
+      onChange: postSchema,
     },
     onSubmit: async ({ value }) => {
       const formData = new FormData();
@@ -60,6 +63,7 @@ export function PostDialog() {
       formData.append("description", value.description);
       formData.append("license", value.license);
       formData.append("downloadable", String(value.downloadable));
+      formData.append("tags", value.tags.join(","));
 
       toast.promise(postAction(formData), {
         loading: "画像を投稿中...",
@@ -71,11 +75,20 @@ export function PostDialog() {
 
       setOpen(false);
       form.reset();
+      setTagsInput("");
     },
   });
 
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen);
+    if (!newOpen) {
+      form.reset();
+      setTagsInput("");
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline">画像を投稿</Button>
       </DialogTrigger>
@@ -290,6 +303,76 @@ export function PostDialog() {
                     </FieldLabel>
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                );
+              }}
+            />
+            <form.Field
+              name="tags"
+              validators={{
+                onChange: ({ value }) => {
+                  if (value.length > 10) {
+                    return "タグは10個以下にしてください。";
+                  }
+                  const tooLongTag = value.find((tag) => tag.length > 20);
+                  if (tooLongTag) {
+                    return `タグ「${tooLongTag}」は20文字以下にしてください。`;
+                  }
+                  return undefined;
+                },
+              }}
+              children={(field) => {
+                const hasErrors = field.state.meta.errors.length > 0;
+                const handleChange = (
+                  e: React.ChangeEvent<HTMLInputElement>,
+                ) => {
+                  const raw = e.target.value;
+                  setTagsInput(raw);
+                  const tags = raw
+                    .split(",")
+                    .map((v) => v.trim())
+                    .filter((v) => v.length > 0);
+                  field.handleChange(tags);
+                };
+                const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+                  field.handleBlur();
+                  const raw = e.target.value;
+                  const tags = [
+                    ...new Set(
+                      raw
+                        .split(",")
+                        .map((v) => v.trim())
+                        .filter((v) => v.length > 0),
+                    ),
+                  ];
+                  field.handleChange(tags);
+                  setTagsInput(tags.join(", "));
+                };
+                return (
+                  <Field data-invalid={hasErrors}>
+                    <FieldLabel htmlFor="post-form-tags">
+                      タグ（任意）
+                    </FieldLabel>
+                    <Input
+                      id="post-form-tags"
+                      name={field.name}
+                      value={tagsInput}
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      aria-invalid={hasErrors}
+                      placeholder="風景, 自然, 旅行"
+                      autoComplete="off"
+                    />
+                    <FieldDescription>
+                      カンマ区切りで最大10個のタグを追加できます。
+                    </FieldDescription>
+                    {hasErrors && (
+                      <FieldError
+                        errors={field.state.meta.errors.map((e) => ({
+                          message: typeof e === "string" ? e : String(e),
+                        }))}
+                      />
                     )}
                   </Field>
                 );

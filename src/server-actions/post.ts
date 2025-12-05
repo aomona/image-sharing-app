@@ -20,12 +20,16 @@ export async function postAction(data: FormData) {
   const downloadablerow = data.get("downloadable");
   const downloadable = downloadablerow === "true";
 
+  const tagsrow = data.get("tags") as string;
+  const tags = tagsrow.split(",");
+
   const parsedData = postSchema.parse({
     image: data.get("image"),
     title: data.get("title"),
     description: data.get("description"),
     license: data.get("license"),
     downloadable: downloadable,
+    tags: tags,
   });
 
   const params = {
@@ -46,5 +50,6 @@ export async function postAction(data: FormData) {
     filter: {},
     downloadable: parsedData.downloadable,
     userId: session.user.id,
+    tags: parsedData.tags,
   });
 }
