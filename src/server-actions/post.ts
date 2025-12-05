@@ -21,7 +21,7 @@ export async function postAction(data: FormData) {
   const downloadable = downloadablerow === "true";
 
   const tagsrow = data.get("tags") as string;
-  const tags = tagsrow.split(",");
+  const tags = tagsrow.split(",").filter((tag) => tag.trim().length > 0);
 
   const parsedData = postSchema.parse({
     image: data.get("image"),
