@@ -36,6 +36,7 @@ export const postSchema = z.object({
     .string()
     .max(200, { error: "説明は200文字以下にしてください。" }),
   license: z.enum(licenseValues),
+  downloadable: z.boolean(),
 });
 
 // バリデーション後の型（imageは必須）
@@ -47,4 +48,5 @@ export type PostFormInput = {
   title: string;
   description: string;
   license: License;
+  downloadable: boolean;
 };

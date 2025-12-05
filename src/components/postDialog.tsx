@@ -19,7 +19,7 @@ import {
   FieldError,
   FieldLabel,
   FieldDescription,
-} from "./ui/field";
+} from "@/components/ui/field";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import {
@@ -28,13 +28,14 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
+} from "@/components/ui/select";
 import { postAction } from "@/server-actions/post";
 import {
   postSchema,
   ACCEPTED_IMAGE_TYPES,
   PostFormInput,
 } from "@/schemas/post";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export function PostDialog() {
   const [open, setOpen] = useState(false);
@@ -45,6 +46,7 @@ export function PostDialog() {
       title: "",
       description: "",
       license: "none",
+      downloadable: false,
     } as PostFormInput,
     validators: {
       onSubmit: postSchema,
@@ -201,7 +203,7 @@ export function PostDialog() {
                 return (
                   <Field data-invalid={isInvalid}>
                     <FieldLabel htmlFor="post-form-license">
-                      ライセンス（任意）
+                      ライセンス
                     </FieldLabel>
                     <Select
                       name={field.name}
@@ -267,9 +269,30 @@ export function PostDialog() {
                         </SelectItem>
                       </SelectContent>
                     </Select>
-                    <FieldDescription>
-                      画像のライセンスを選択してください
-                    </FieldDescription>
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                );
+              }}
+            />
+            <form.Field
+              name="downloadable"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field orientation="horizontal" data-invalid={isInvalid}>
+                    <Checkbox
+                      checked={field.state.value}
+                      onCheckedChange={(checked) =>
+                        field.handleChange(checked === true)
+                      }
+                      id="post-form-donloadable"
+                    />
+                    <FieldLabel htmlFor="post-form-donloadable">
+                      ダウンロードを許可
+                    </FieldLabel>
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
                     )}
