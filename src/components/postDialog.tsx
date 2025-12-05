@@ -299,7 +299,7 @@ export function PostDialog() {
                       }
                       id="post-form-downloadable"
                     />
-                    <FieldLabel htmlFor="post-form-donloadable">
+                    <FieldLabel htmlFor="post-form-downloadable">
                       ダウンロードを許可
                     </FieldLabel>
                     {isInvalid && (
