@@ -59,9 +59,11 @@ export function PostDialog() {
       formData.append("title", value.title);
       formData.append("description", value.description);
       formData.append("license", value.license);
+      formData.append("downloadable", String(value.downloadable));
 
       toast.promise(
         postAction(formData).then((result) => {
+          console.log(result);
           if (!result.success) {
             throw new Error("バリデーションエラー");
           }
@@ -121,7 +123,7 @@ export function PostDialog() {
                       aria-invalid={isInvalid}
                     />
                     <FieldDescription>
-                      JPEG, PNG, GIF, WebP, TIFF, BMP, AVIF形式、最大50MB
+                      JPEG, PNG, GIF, WebP, TIFF, BMP, AVIF形式、最大20MB
                     </FieldDescription>
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />

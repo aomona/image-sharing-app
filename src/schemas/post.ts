@@ -27,7 +27,7 @@ export const postSchema = z.object({
   image: z
     .file({ error: "画像ファイルを選択してください。" })
     .mime(ACCEPTED_IMAGE_TYPES, { error: "サポートされていない形式です。" })
-    .max(50 * 1024 * 1024, { error: "画像サイズは50MB以下にしてください。" }),
+    .max(20 * 1024 * 1024, { error: "画像サイズは20MB以下にしてください。" }),
   title: z
     .string()
     .min(1, { error: "タイトルは必須です。" })
