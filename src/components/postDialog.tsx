@@ -65,19 +65,20 @@ export function PostDialog() {
       formData.append("downloadable", String(value.downloadable));
       formData.append("tags", value.tags.join(","));
 
+      const toastId = toast.loading("画像を投稿中...");
       try {
-        toast.promise(postAction(formData), {
-          loading: "画像を投稿中...",
-          success: "画像の投稿が正常に完了しました。",
-          error: (err) =>
-            err.message
-              ? `画像の投稿に失敗しました。 ${err.message}`
-              : "画像の投稿に失敗しました。",
-        });
+        await postAction(formData);
+        toast.success("画像の投稿が正常に完了しました。", { id: toastId });
         setOpen(false);
         form.reset();
         setTagsInput("");
-      } catch {}
+      } catch (err) {
+        const message =
+          err instanceof Error && err.message
+            ? `画像の投稿に失敗しました。 ${err.message}`
+            : "画像の投稿に失敗しました。";
+        toast.error(message, { id: toastId });
+      }
     },
   });
 
