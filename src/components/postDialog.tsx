@@ -296,7 +296,7 @@ export function PostDialog() {
                       onCheckedChange={(checked) =>
                         field.handleChange(checked === true)
                       }
-                      id="post-form-donloadable"
+                      id="post-form-downloadable"
                     />
                     <FieldLabel htmlFor="post-form-donloadable">
                       ダウンロードを許可
