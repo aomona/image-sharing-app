@@ -69,8 +69,9 @@ export function PostDialog() {
         loading: "画像を投稿中...",
         success: "画像の投稿が正常に完了しました。",
         error: (err) =>
-          `画像の投稿に失敗しました。 ${err.message}` ||
-          "画像の投稿に失敗しました。",
+          err.message
+            ? `画像の投稿に失敗しました。 ${err.message}`
+            : "画像の投稿に失敗しました。",
       });
 
       setOpen(false);
