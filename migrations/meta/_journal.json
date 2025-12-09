@@ -36,6 +36,13 @@
       "when": 1764875172747,
       "tag": "0004_flashy_darwin",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1765259906594,
+      "tag": "0005_good_madripoor",
+      "breakpoints": true
     }
   ]
 }
