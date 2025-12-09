@@ -36,3 +36,25 @@ export const post = pgTable(
     index("post_createdAt_idx").on(table.createdAt),
   ],
 );
+
+export const follow = pgTable(
+  "follow",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    followerId: text("follower_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    followingId: text("following_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("follow_followerId_idx").on(table.followerId),
+    index("follow_followingId_idx").on(table.followingId),
+    index("follow_followerId_followingId_idx").on(
+      table.followerId,
+      table.followingId,
+    ),
+  ],
+);
