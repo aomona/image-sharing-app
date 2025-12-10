@@ -43,6 +43,13 @@
       "when": 1765259906594,
       "tag": "0005_good_madripoor",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1765332662150,
+      "tag": "0006_simple_lady_deathstrike",
+      "breakpoints": true
     }
   ]
 }
