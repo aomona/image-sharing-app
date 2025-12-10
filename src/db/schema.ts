@@ -1,6 +1,5 @@
 import {
   uuid,
-  boolean,
   pgTable,
   text,
   index,
@@ -14,14 +13,11 @@ export const post = pgTable(
   "post",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    title: text("title").notNull(),
     originalImageUrl: text("original_image_url").notNull(),
     imageUrl: text("image_url").notNull(),
     filter: json("filter"),
     description: text("description"),
     tags: text("tags").array(),
-    ccLicense: text("cc_license").notNull(),
-    downloadable: boolean("downloadable"),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
