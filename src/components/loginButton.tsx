@@ -12,8 +12,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { usePathname } from "next/navigation";
 
 export function LoginButton() {
+  const pathname = usePathname();
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -31,7 +33,7 @@ export function LoginButton() {
             onClick={async () => {
               await signIn.social({
                 provider: "google",
-                callbackURL: "/",
+                callbackURL: pathname,
               });
             }}
             className="w-full"
