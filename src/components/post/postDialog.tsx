@@ -210,7 +210,7 @@ export function PostDialog() {
                       <FieldDescription
                         className={`${field.state.value.length > 200 ? "text-red-400" : ""}`}
                       >
-                        {field.state.value?.length || 0}/200文字
+                        {field.state.value.length}/200文字
                       </FieldDescription>
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
