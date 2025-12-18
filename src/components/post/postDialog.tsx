@@ -89,7 +89,7 @@ export function PostDialog() {
     <>
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogTrigger asChild>
-          <Button variant="outline">投稿する。</Button>
+          <Button variant="outline">投稿する</Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
