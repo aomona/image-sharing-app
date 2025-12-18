@@ -26,7 +26,7 @@ export function PostCloseAlertDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>本当に閉じますか？</AlertDialogTitle>
           <AlertDialogDescription>
-            閉じると現在の下書きが全て削除されます。
+            閉じると現在の下書きが全て削除されます
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
