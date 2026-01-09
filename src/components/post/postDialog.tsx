@@ -36,7 +36,6 @@ export function PostDialog() {
     setShowCloseAlert(false);
     setOpen(false);
     form.reset();
-    previewUrls.forEach((url) => URL.revokeObjectURL(url));
     setPreviewUrls([]);
   };
 
@@ -67,7 +66,6 @@ export function PostDialog() {
         toast.success("画像の投稿が正常に完了しました。", { id: toastId });
         setOpen(false);
         form.reset();
-        previewUrls.forEach((url) => URL.revokeObjectURL(url));
         setPreviewUrls([]);
       } catch (err) {
         const message =
@@ -87,7 +85,6 @@ export function PostDialog() {
         return;
       }
       form.reset();
-      previewUrls.forEach((url) => URL.revokeObjectURL(url));
       setPreviewUrls([]);
     }
     setOpen(newOpen);
@@ -127,13 +124,15 @@ export function PostDialog() {
                         accept={ACCEPTED_TYPES.join(",")}
                         multiple
                         onBlur={field.handleBlur}
-                        onChange={(e) => {
+                        onChange={async (e) => {
                           const files = e.target.files;
-                          if (files) {
-                            const fileArray = Array.from(files);
-                            field.handleChange(fileArray);
-                            createPreviewDataUrls(fileArray);
-                          }
+                          if (!files) return;
+
+                          const fileArray = Array.from(files);
+                          field.handleChange(fileArray);
+
+                          const urls = await createPreviewDataUrls(fileArray);
+                          setPreviewUrls(urls);
                         }}
                         aria-invalid={isInvalid}
                       />
