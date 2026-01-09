@@ -26,6 +26,7 @@ import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { postAction } from "@/server-actions/post";
 import { postSchema, ACCEPTED_TYPES, MAX_SIZE_MB } from "@/schemas/post";
+import { createPreviewDataUrls } from "./imagePreview";
 
 export function PostDialog() {
   const [open, setOpen] = useState(false);
@@ -92,12 +93,6 @@ export function PostDialog() {
     setOpen(newOpen);
   };
 
-  const createPreviewUrls = (files: File[]) => {
-    previewUrls.forEach((url) => URL.revokeObjectURL(url));
-    const newUrls = files.map((file) => URL.createObjectURL(file));
-    setPreviewUrls(newUrls);
-  };
-
   return (
     <>
       <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -137,7 +132,7 @@ export function PostDialog() {
                           if (files) {
                             const fileArray = Array.from(files);
                             field.handleChange(fileArray);
-                            createPreviewUrls(fileArray);
+                            createPreviewDataUrls(fileArray);
                           }
                         }}
                         aria-invalid={isInvalid}
