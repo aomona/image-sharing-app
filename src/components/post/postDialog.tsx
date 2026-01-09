@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { Button } from "@/components/ui/button";
 import { PostCloseAlertDialog } from "./postCloseAlertDialog";
+import Image from "next/image";
 import {
   Dialog,
   DialogContent,
@@ -29,11 +30,13 @@ import { postSchema, ACCEPTED_TYPES, MAX_SIZE_MB } from "@/schemas/post";
 export function PostDialog() {
   const [open, setOpen] = useState(false);
   const [showCloseAlert, setShowCloseAlert] = useState(false);
-
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const handleConfirmClose = () => {
     setShowCloseAlert(false);
     setOpen(false);
     form.reset();
+    previewUrls.forEach((url) => URL.revokeObjectURL(url));
+    setPreviewUrls([]);
   };
 
   const form = useForm({
@@ -63,6 +66,8 @@ export function PostDialog() {
         toast.success("画像の投稿が正常に完了しました。", { id: toastId });
         setOpen(false);
         form.reset();
+        previewUrls.forEach((url) => URL.revokeObjectURL(url));
+        setPreviewUrls([]);
       } catch (err) {
         const message =
           err instanceof Error && err.message
@@ -81,8 +86,16 @@ export function PostDialog() {
         return;
       }
       form.reset();
+      previewUrls.forEach((url) => URL.revokeObjectURL(url));
+      setPreviewUrls([]);
     }
     setOpen(newOpen);
+  };
+
+  const createPreviewUrls = (files: File[]) => {
+    previewUrls.forEach((url) => URL.revokeObjectURL(url));
+    const newUrls = files.map((file) => URL.createObjectURL(file));
+    setPreviewUrls(newUrls);
   };
 
   return (
@@ -91,7 +104,7 @@ export function PostDialog() {
         <DialogTrigger asChild>
           <Button variant="outline">投稿する</Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-125">
           <DialogHeader>
             <DialogTitle>画像を投稿</DialogTitle>
             <DialogDescription>どんな写真が撮れた？</DialogDescription>
@@ -122,7 +135,9 @@ export function PostDialog() {
                         onChange={(e) => {
                           const files = e.target.files;
                           if (files) {
-                            field.handleChange(Array.from(files));
+                            const fileArray = Array.from(files);
+                            field.handleChange(fileArray);
+                            createPreviewUrls(fileArray);
                           }
                         }}
                         aria-invalid={isInvalid}
@@ -138,6 +153,24 @@ export function PostDialog() {
                       </FieldDescription>
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
+                      )}
+                      {/* 画像プレビュー */}
+                      {previewUrls.length > 0 && (
+                        <div className="mt-3 flex gap-2 overflow-x-auto">
+                          {previewUrls.map((url, index) => (
+                            <div
+                              key={url}
+                              className="relative h-24 w-24 shrink-0 overflow-hidden rounded-md border"
+                            >
+                              <Image
+                                src={url}
+                                alt={`プレビュー ${index + 1}`}
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                          ))}
+                        </div>
                       )}
                     </Field>
                   );
@@ -163,7 +196,7 @@ export function PostDialog() {
                         onChange={(e) => field.handleChange(e.target.value)}
                         aria-invalid={isInvalid}
                         placeholder="投稿に本文を追加..."
-                        className="min-h-[100px] resize-none"
+                        className="min-h-25 resize-none"
                       />
                       <FieldDescription
                         className={`${textLength > 200 ? "text-red-400" : ""}`}
