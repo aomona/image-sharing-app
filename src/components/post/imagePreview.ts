@@ -1,5 +1,5 @@
 export async function resizeImageToDataUrl(file: File, maxSize: number) {
-  return new Promise<string>((resolve) => {
+  return new Promise<string>((resolve, reject) => {
     const img = new window.Image();
     const url = URL.createObjectURL(file);
 
@@ -28,6 +28,11 @@ export async function resizeImageToDataUrl(file: File, maxSize: number) {
       ctx?.drawImage(img, 0, 0, width, height);
 
       resolve(canvas.toDataURL("image/jpeg", 0.7));
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("画像の読み込みに失敗しました"));
     };
 
     img.src = url;
