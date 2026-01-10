@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { post } from "@/db/schema";
+import { postImage, post } from "@/db/schema";
 import { r2 } from "@/lib/r2";
 import { postSchema } from "@/schemas/post";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
@@ -16,43 +16,56 @@ export async function postAction(data: FormData) {
   if (!session) {
     throw new Error("この操作にはログインが必要です。");
   }
-
-  const downloadablerow = data.get("downloadable");
-  const downloadable = downloadablerow === "true";
-
-  const tagsrow = data.get("tags") as string;
-  const tags = tagsrow.split(",").filter((tag) => tag.trim().length > 0);
-
   const parsedData = postSchema.parse({
-    image: data.get("image"),
-    title: data.get("title"),
-    description: data.get("description"),
-    license: data.get("license"),
-    downloadable: downloadable,
-    tags: tags,
+    image: data.getAll("image"),
+    postText: data.get("postText"),
   });
-  const safeName = parsedData.image.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-  const params = {
-    Bucket: process.env.R2_BUCKET_NAME,
-    Key: `images/${crypto.randomUUID()}-${safeName}`,
-    Body: Buffer.from(await parsedData.image.arrayBuffer()),
-    ContentType: parsedData.image.type,
-  };
-  try {
-    await r2.send(new PutObjectCommand(params));
-    const imageUrl = `${process.env.R2_CUSTOM_DOMAIN_URL}/${params.Key}`;
-    await db.insert(post).values({
-      title: parsedData.title,
-      originalImageUrl: imageUrl,
-      imageUrl: imageUrl,
-      description: parsedData.description,
-      ccLicense: parsedData.license,
-      filter: {},
-      downloadable: parsedData.downloadable,
+
+  const postId = crypto.randomUUID();
+
+  const uploaded = await Promise.all(
+    parsedData.image.map(async (file) => {
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const key = `images/${crypto.randomUUID()}-${safeName}`;
+
+      await r2.send(
+        new PutObjectCommand({
+          Bucket: process.env.R2_BUCKET_NAME,
+          Key: key,
+          Body: new Uint8Array(await file.arrayBuffer()),
+          ContentType: file.type,
+        }),
+      );
+
+      return {
+        key,
+        url: `${process.env.R2_CUSTOM_DOMAIN_URL!.replace(/\/$/, "")}/${key}`,
+      };
+    }),
+  );
+
+  // try {
+  await db.transaction(async (tx) => {
+    await tx.insert(post).values({
+      id: postId,
+      text: parsedData.postText,
       userId: session.user.id,
-      tags: parsedData.tags,
     });
-  } catch {
-    throw new Error("画像のアップロードに失敗しました。");
-  }
+
+    if (uploaded.length) {
+      await tx.insert(postImage).values(
+        uploaded.map(({ url }) => ({
+          originalImageUrl: url,
+          imageUrl: url,
+          filter: {},
+          postId,
+        })),
+      );
+    }
+  });
+
+  return { id: postId };
+  // } catch {
+  //   throw new Error("投稿の作成に失敗しました");
+  // }
 }
