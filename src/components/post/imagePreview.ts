@@ -25,7 +25,11 @@ export async function resizeImageToDataUrl(file: File, maxSize: number) {
       canvas.height = height;
 
       const ctx = canvas.getContext("2d");
-      ctx?.drawImage(img, 0, 0, width, height);
+      if (!ctx) {
+        reject(new Error("Canvas 2Dコンテキストの取得に失敗しました"));
+        return;
+      }
+      ctx.drawImage(img, 0, 0, width, height);
 
       resolve(canvas.toDataURL("image/jpeg", 0.7));
     };
