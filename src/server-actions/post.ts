@@ -44,28 +44,28 @@ export async function postAction(data: FormData) {
     }),
   );
 
-  // try {
-  await db.transaction(async (tx) => {
-    await tx.insert(post).values({
-      id: postId,
-      text: parsedData.postText,
-      userId: session.user.id,
+  try {
+    await db.transaction(async (tx) => {
+      await tx.insert(post).values({
+        id: postId,
+        text: parsedData.postText,
+        userId: session.user.id,
+      });
+
+      if (uploaded.length) {
+        await tx.insert(postImage).values(
+          uploaded.map(({ url }) => ({
+            originalImageUrl: url,
+            imageUrl: url,
+            filter: {},
+            postId,
+          })),
+        );
+      }
     });
 
-    if (uploaded.length) {
-      await tx.insert(postImage).values(
-        uploaded.map(({ url }) => ({
-          originalImageUrl: url,
-          imageUrl: url,
-          filter: {},
-          postId,
-        })),
-      );
-    }
-  });
-
-  return { id: postId };
-  // } catch {
-  //   throw new Error("投稿の作成に失敗しました");
-  // }
+    return { id: postId };
+  } catch {
+    throw new Error("投稿の作成に失敗しました");
+  }
 }
