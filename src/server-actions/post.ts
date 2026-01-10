@@ -57,7 +57,7 @@ export async function postAction(data: FormData) {
           uploaded.map(({ url }) => ({
             originalImageUrl: url,
             imageUrl: url,
-            filter: {},
+            filter: [],
             postId,
           })),
         );
