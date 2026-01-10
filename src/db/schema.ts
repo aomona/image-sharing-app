@@ -1,11 +1,13 @@
 import {
   uuid,
-  boolean,
   pgTable,
   text,
   index,
   timestamp,
-  json,
+  primaryKey,
+  jsonb,
+  integer,
+  unique,
 } from "drizzle-orm/pg-core";
 import { user } from "@/db/auth-scheme";
 export * from "@/db/auth-scheme";
@@ -14,20 +16,15 @@ export const post = pgTable(
   "post",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    title: text("title").notNull(),
-    originalImageUrl: text("original_image_url").notNull(),
-    imageUrl: text("image_url").notNull(),
-    filter: json("filter"),
-    description: text("description"),
+    text: text("text"),
     tags: text("tags").array(),
-    ccLicense: text("cc_license").notNull(),
-    downloadable: boolean("downloadable"),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .$onUpdate(() => /* @__PURE__ */ new Date())
+      .defaultNow()
       .notNull(),
   },
   (table) => [
@@ -37,10 +34,42 @@ export const post = pgTable(
   ],
 );
 
+export const postImage = pgTable(
+  "post_image",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    originalImageUrl: text("original_image_url").notNull(),
+    imageUrl: text("image_url").notNull(),
+    filter: jsonb("filter").notNull().default([]),
+    postId: uuid("post_id")
+      .notNull()
+      .references(() => post.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("post_image_postId_idx").on(table.postId)],
+);
+
+export const postLike = pgTable(
+  "post_like",
+  {
+    postId: uuid("post_id")
+      .notNull()
+      .references(() => post.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.postId, table.userId] }),
+    index("post_like_postId_idx").on(table.postId),
+    index("post_like_userId_idx").on(table.userId),
+  ],
+);
+
 export const follow = pgTable(
   "follow",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
     followerId: text("follower_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
@@ -50,11 +79,33 @@ export const follow = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
+    primaryKey({ columns: [table.followerId, table.followingId] }),
     index("follow_followerId_idx").on(table.followerId),
     index("follow_followingId_idx").on(table.followingId),
-    index("follow_followerId_followingId_idx").on(
-      table.followerId,
-      table.followingId,
-    ),
+  ],
+);
+
+export const gallery = pgTable(
+  "gallery",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    index: integer("index").notNull(),
+    name: text("name").notNull(),
+    description: text("description"),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    postId: uuid("post_id")
+      .notNull()
+      .references(() => post.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    unique("gallery_userId_index_unique").on(table.userId, table.index),
+    index("gallery_userId_idx").on(table.userId),
   ],
 );
